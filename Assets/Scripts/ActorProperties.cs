@@ -9,15 +9,11 @@ public class ActorProperties
     private bool _isSelected;
     public bool isSelected
     {
-        get
-        {
-            return _isSelected;
-        }
+        get => _isSelected;
         set
         {
             _isSelected = value;
-            if (SelectionChangedEvent != null)
-                SelectionChangedEvent(_isSelected);
+            SelectionChangedEvent?.Invoke(_isSelected);
         }
     }
 
