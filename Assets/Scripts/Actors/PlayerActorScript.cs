@@ -108,7 +108,11 @@ public class PlayerActorScript : ActorScript
 
     protected override void OnLeftMouseClick(PointerEventData pointerEventData)
     {
-        
+        if (SM.inputController.targetingMode == InputController.TargetingMode.None)
+        {
+            // Select this
+            SM.selectionManager.SelectPlayer(player);
+        }
     }
 
     private void SetTraderAppearance()
@@ -134,5 +138,10 @@ public class PlayerActorScript : ActorScript
     public override string GetStatsJson()
     {
         return JsonUtility.ToJson(player);
+    }
+
+    public override bool IsSelected()
+    {
+        return SM.playerActorManager.playerProperties[player].isSelected;
     }
 }

@@ -107,4 +107,9 @@ public class UserActorScript : ActorScript
     {
         return JsonUtility.ToJson(client.UserChar);
     }
+
+    public override bool IsSelected()
+    {
+        return SM.userActorManager.clientProperties[client].isSelected;
+    }
 }

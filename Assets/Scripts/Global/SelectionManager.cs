@@ -21,109 +21,78 @@ public class SelectionManager : MonoBehaviour
         selectedActors = new LinkedList<ActorScript>();
     }
 
-    void Start()
+    protected void Start()
     {
         SM = FindObjectOfType<L2RTSServerManager>();
     }
 
-    void Update()
-    {
-
-    }
-
     public void ClearSelection()
     {
-        if (selectedActors.Count == 0)
-            return;
-
-        foreach (ActorScript actor in selectedActors)
-        {
-            ActorProperties props = null;
-            if (actor is UserActorScript userActor)
-                props = SM.userActorManager.clientProperties[userActor.client];
-            else if (actor is PlayerActorScript playerActor)
-                props = SM.playerActorManager.playerProperties[playerActor.player];
-            else if (actor is NPCActorScript npcActor)
-                props = SM.npcActorManager.npcProperties[npcActor.npc];
-
-            if (props == null || !props.isSelected) continue;
-            props.isSelected = false;
-        }
-
-        selectedActors.Clear();
+        ClearUserSelection();
+        ClearNpcSelection();
+        ClearPlayerSelection();
         SelectionChangedEvent?.Invoke();
     }
 
-    private void ClearAllButUserSelection()
+    private void ClearUserSelection()
     {
-        if (selectedActors.Count == 0)
-            return;
-
-        LinkedList<ActorScript> newList = new LinkedList<ActorScript>();
-        foreach (ActorScript actor in selectedActors)
+        SM.userActorManager.clientProperties.ForEach((kv) =>
         {
-            ActorProperties props = null;
-            if (actor is PlayerActorScript playerActor)
-                props = SM.playerActorManager.playerProperties[playerActor.player];
-            else if (actor is NPCActorScript npcActor)
-                props = SM.npcActorManager.npcProperties[npcActor.npc];
-            else
-                newList.AddLast(actor);
-
-            if (props == null || !props.isSelected) continue;
-            props.isSelected = false;
-        }
-
-        selectedActors = newList;
-
+            if (kv.Value != null && kv.Value.isSelected)
+                kv.Value.isSelected = false;
+        });
     }
 
-    private void ClearAllButPlayerSelection()
+    private void ClearPlayerSelection()
     {
-        if (selectedActors.Count == 0)
-            return;
-
-        LinkedList<ActorScript> newList = new LinkedList<ActorScript>();
-        foreach (ActorScript actor in selectedActors)
+        SM.playerActorManager.playerProperties.ForEach((kv) =>
         {
-            ActorProperties props = null;
-            if (actor is UserActorScript userActor)
-                props = SM.userActorManager.clientProperties[userActor.client];
-            else if (actor is NPCActorScript npcActor)
-                props = SM.npcActorManager.npcProperties[npcActor.npc];
-            else
-                newList.AddLast(actor);
-
-            if (props == null || !props.isSelected) continue;
-            selectedActors.Remove(actor);
-            props.isSelected = false;
-        }
-
-        selectedActors = newList;
+            if (kv.Value != null && kv.Value.isSelected)
+                kv.Value.isSelected = false;
+        });
     }
 
-    private void ClearAllButNpcSelection()
+    private void ClearNpcSelection()
     {
-        if (selectedActors.Count == 0)
-            return;
-
-        LinkedList<ActorScript> newList = new LinkedList<ActorScript>();
-        foreach (ActorScript actor in selectedActors)
+        SM.npcActorManager.npcProperties.ForEach((kv) =>
         {
-            ActorProperties props = null;
-            if (actor is UserActorScript userActor)
-                props = SM.userActorManager.clientProperties[userActor.client];
-            else if (actor is PlayerActorScript playerActor)
-                props = SM.playerActorManager.playerProperties[playerActor.player];
-            else
-                newList.AddLast(actor);
+            if (kv.Value != null && kv.Value.isSelected)
+                kv.Value.isSelected = false;
+        });
+    }
 
-            if (props == null || !props.isSelected) continue;
-            selectedActors.Remove(actor);
-            props.isSelected = false;
+    /// <summary>
+    /// Check properties for all UserActors and update selection list according to them.
+    /// </summary>
+    public void UpdateSelectedUsers()
+    {
+        bool isUserSelected = false;
+        foreach (var kv in SM.userActorManager.clientProperties)
+        {
+            if (kv.Value.actor == null)
+                continue;
+            var uas = kv.Value.actor.GetComponent<UserActorScript>();
+            if (kv.Value.isSelected)
+            {
+                if (!selectedActors.Contains(uas))
+                    selectedActors.AddLast(uas);
+            }
+            else
+            {
+                if (selectedActors.Contains(uas))
+                {
+                    selectedActors.AddLast(uas);
+                    isUserSelected = true;
+                }
+            }
         }
 
-        selectedActors = newList;
+        if (isUserSelected)
+        {
+            ClearPlayerSelection();
+            ClearNpcSelection();
+            SelectionChangedEvent?.Invoke();
+        }
     }
 
     public void SelectUser(RTSClient cl)
@@ -135,20 +104,17 @@ public class SelectionManager : MonoBehaviour
                 if (!kv.Value.isSelected)
                 {
                     kv.Value.isSelected = true;
-                    if (kv.Value.actor != null)
-                        selectedActors.AddLast(kv.Value.actor.GetComponent<ActorScript>());
                 }
             }
             else if (kv.Value.isSelected)
             {
                 kv.Value.isSelected = false;
-                if (kv.Value.actor != null)
-                    selectedActors.Remove(kv.Value.actor.GetComponent<ActorScript>());
             }
 
         }
 
-        ClearAllButUserSelection();
+        ClearPlayerSelection();
+        ClearNpcSelection();
 
         SelectionChangedEvent?.Invoke();
     }
@@ -162,14 +128,13 @@ public class SelectionManager : MonoBehaviour
                 if (!kv.Value.isSelected)
                 {
                     kv.Value.isSelected = true;
-                    if (kv.Value.actor != null)
-                        selectedActors.AddLast(kv.Value.actor.GetComponent<ActorScript>());
                 }
                 break;
             }
         }
 
-        ClearAllButUserSelection();
+        ClearPlayerSelection();
+        ClearNpcSelection();
 
         SelectionChangedEvent?.Invoke();
     }
@@ -186,8 +151,6 @@ public class SelectionManager : MonoBehaviour
                 if (kv.Value.isSelected)
                 {
                     kv.Value.isSelected = false;
-                    if (kv.Value.actor != null)
-                        selectedActors.Remove(kv.Value.actor.GetComponent<ActorScript>());
                 }
                 break;
             }
@@ -206,20 +169,18 @@ public class SelectionManager : MonoBehaviour
                 if (!kv.Value.isSelected)
                 {
                     kv.Value.isSelected = true;
-                    if (kv.Value.actor != null)
-                        selectedActors.AddLast(kv.Value.actor.GetComponent<ActorScript>());
                 }
             }
-            else if (kv.Value.isSelected)
-            {
-                kv.Value.isSelected = false;
-                if (kv.Value.actor != null)
-                    selectedActors.Remove(kv.Value.actor.GetComponent<ActorScript>());
-            }
+            else 
+                if (kv.Value.isSelected)
+                {
+                    kv.Value.isSelected = false;
+                }
                     
         }
 
-        ClearAllButUserSelection();
+        ClearPlayerSelection();
+        ClearNpcSelection();
 
         SelectionChangedEvent?.Invoke();
     }
@@ -234,13 +195,12 @@ public class SelectionManager : MonoBehaviour
                 if (!kv.Value.isSelected)
                 {
                     kv.Value.isSelected = true;
-                    if (kv.Value.actor != null)
-                        selectedActors.AddLast(kv.Value.actor.GetComponent<ActorScript>());
                 }
             }
         }
 
-        ClearAllButUserSelection();
+        ClearPlayerSelection();
+        ClearNpcSelection();
 
         SelectionChangedEvent?.Invoke();
     }
@@ -255,19 +215,16 @@ public class SelectionManager : MonoBehaviour
                 if (!kv.Value.isSelected)
                 {
                     kv.Value.isSelected = true;
-                    if (kv.Value.actor != null)
-                        selectedActors.AddLast(kv.Value.actor.GetComponent<ActorScript>());
                 }
                 else
                 {
                     kv.Value.isSelected = false;
-                    if (kv.Value.actor != null)
-                        selectedActors.Remove(kv.Value.actor.GetComponent<ActorScript>());
                 }
             }
         }
 
-        ClearAllButUserSelection();
+        ClearPlayerSelection();
+        ClearNpcSelection();
 
         SelectionChangedEvent?.Invoke();
     }
@@ -283,16 +240,15 @@ public class SelectionManager : MonoBehaviour
                 else
                 {
                     kv.Value.isSelected = true;
-                    selectedActors.AddLast(kv.Value.actor.GetComponent<ActorScript>());
                 }
             else if (kv.Value.isSelected)
             {
                 kv.Value.isSelected = false;
-                selectedActors.Remove(kv.Value.actor.GetComponent<ActorScript>());
             }
         }
 
-        ClearAllButNpcSelection();
+        ClearUserSelection();
+        ClearPlayerSelection();
 
         SelectionChangedEvent?.Invoke();
     }
@@ -307,16 +263,15 @@ public class SelectionManager : MonoBehaviour
                 else
                 {
                     kv.Value.isSelected = true;
-                    selectedActors.AddLast(kv.Value.actor.GetComponent<ActorScript>());
                 }
             else if (kv.Value.isSelected)
             {
                 kv.Value.isSelected = false;
-                selectedActors.Remove(kv.Value.actor.GetComponent<ActorScript>());
             }
         }
 
-        ClearAllButPlayerSelection();
+        ClearUserSelection();
+        ClearNpcSelection();
 
         SelectionChangedEvent?.Invoke();
     }

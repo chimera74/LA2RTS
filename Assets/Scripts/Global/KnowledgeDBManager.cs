@@ -7,7 +7,8 @@ public class KnowledgeDBManager : MonoBehaviour
     private int[] raidBossIds =
     {
         25357,
-        25188
+        25188,
+        25041
     };
 
     // Use this for initialization

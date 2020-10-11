@@ -186,14 +186,23 @@ public abstract class ActorScript : MonoBehaviour, IPointerClickHandler
 
     protected virtual void OnSelectionChanged(bool isSelected)
     {
+        if (isSelected)
+        {
+            if (!SM.selectionManager.selectedActors.Contains(this))
+                SM.selectionManager.selectedActors.AddLast(this);
+        }
+        else
+        if (SM.selectionManager.selectedActors.Contains(this))
+            SM.selectionManager.selectedActors.Remove(this);
+
         _actionQueue.Enqueue(() =>
         {
             SetHighlight(isSelected);
-            if (isSelected)
-            {
-                actorInfoPanel.currentActor = _live;
-                actorInfoPanel.Show();
-            }
+            // if (isSelected)
+            // {
+            //     actorInfoPanel.currentActor = _live;
+            //     actorInfoPanel.Show();
+            // }
         });
     }
 
@@ -289,4 +298,6 @@ public abstract class ActorScript : MonoBehaviour, IPointerClickHandler
     protected abstract void OnLeftMouseClick(PointerEventData pointerEventData);
 
     public abstract string GetStatsJson();
+
+    public abstract bool IsSelected();
 }

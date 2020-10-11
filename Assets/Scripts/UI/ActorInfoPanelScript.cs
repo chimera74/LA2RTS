@@ -6,7 +6,6 @@ using LA2RTS.LA2Entities;
 public class ActorInfoPanelScript : MonoBehaviour
 {
     public Text infoText;
-    public LA2Live currentActor;
 
     private SimpleActionQueue _actionQueue;
     private L2RTSServerManager SM;

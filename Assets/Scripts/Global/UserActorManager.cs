@@ -17,7 +17,7 @@ public class UserActorManager : MonoBehaviour
     [Header("Prefabs")]
     public GameObject UserActorPrefab;
 
-    [Header("Requred references")]
+    [Header("Required references")]
     public GameObject MainCamera;
 
     private void OnEnable()
@@ -26,19 +26,14 @@ public class UserActorManager : MonoBehaviour
         SM.ServerStartedEvent += RegisterToEvents;
     }
 
-    void Awake()
+    protected void Awake()
     {
         _actionQueue = new SimpleActionQueue();
         clientProperties = new Dictionary<RTSClient, ActorProperties>();
     }
-    // Use this for initialization
-    void Start()
-    {
-
-    }
 
     // Update is called once per frame
-    void Update()
+    protected void Update()
     {
         _actionQueue.InvokeAll();
     }
@@ -94,6 +89,7 @@ public class UserActorManager : MonoBehaviour
                 _actionQueue.Enqueue(() =>
                 {
                     CreateActor(cl);
+                    SM.selectionManager.UpdateSelectedUsers();
                 });
             }
         }

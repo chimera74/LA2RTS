@@ -57,9 +57,14 @@ public class NPCActorScript : ActorScript
     {
         if (SM.inputController.targetingMode == InputController.TargetingMode.SimpleAttack)
         {
+            // Attack this
             AttackThisCommand();
             SM.inputController.ExitTargeting();
             return;
+        } else if (SM.inputController.targetingMode == InputController.TargetingMode.None)
+        {
+            // Select this
+            SM.selectionManager.SelectNPC(npc);
         }
     }
 
@@ -75,10 +80,6 @@ public class NPCActorScript : ActorScript
             {
                 AttackThisCommand();
             }
-        }
-        else
-        {
-            SM.inputController.ExitTargeting();
         }
     }
 
@@ -108,18 +109,18 @@ public class NPCActorScript : ActorScript
         });
     }
 
-    override public void SelectAppearance()
+    public override void SelectAppearance()
     {
         if (npc.Dead)
             SetDeadAppearance();
         else if (SM.knowledgeDBManager.IsRaidBoss(npc.ID))
         {
-            SetRaidBossAppearence();
+            SetRaidBossAppearance();
             SetOutlineColor(OutlineColor.Enemy);
         }
         else if (npc.Attackable)
         {
-            SetMonsterAppearence();
+            SetMonsterAppearance();
             SetOutlineColor(OutlineColor.Enemy);
         }
         else
@@ -129,13 +130,13 @@ public class NPCActorScript : ActorScript
         }
     }
 
-    private void SetMonsterAppearence()
+    private void SetMonsterAppearance()
     {
         SetNameplateVisibility(defaultNameplateVisibility);
         GetComponent<Renderer>().material = monsterMaterial;
     }
 
-    private void SetRaidBossAppearence()
+    private void SetRaidBossAppearance()
     {
         transform.localScale = new Vector3(0.8f, 0.9f, 0.8f);
         defaultNameplateVisibility = true;
@@ -146,5 +147,10 @@ public class NPCActorScript : ActorScript
     public override string GetStatsJson()
     {
         return JsonUtility.ToJson(npc);
+    }
+
+    public override bool IsSelected()
+    {
+        return SM.npcActorManager.npcProperties[npc].isSelected;
     }
 }
