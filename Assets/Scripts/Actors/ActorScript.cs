@@ -25,7 +25,7 @@ public abstract class ActorScript : MonoBehaviour, IPointerClickHandler
 
     public ActorProperties properties;
 
-    protected LA2Live _live;
+    public LA2Live live;
     protected GameObject destinationLine;
     protected GameObject targetLine;
 
@@ -36,15 +36,10 @@ public abstract class ActorScript : MonoBehaviour, IPointerClickHandler
     protected SimpleActionQueue _actionQueue;
     protected L2RTSServerManager SM;
 
-    public void Awake()
+    protected virtual void Awake()
     {
         _actionQueue = new SimpleActionQueue();
         hasActualPosition = false;
-    }
-
-    // Use this for initialization
-    protected virtual void Start()
-    {
         SM = FindObjectOfType<L2RTSServerManager>();
         actorInfoPanel = FindObjectOfType<ActorInfoPanelScript>();
     }
@@ -57,9 +52,9 @@ public abstract class ActorScript : MonoBehaviour, IPointerClickHandler
 
     protected void DrawTargetLine()
     {
-        if (_live.TargetOID > 0)
+        if (live.TargetOID > 0)
         {
-            LA2Live target = SM.Server.FindSpawnByOID(_live.TargetOID);
+            LA2Live target = SM.Server.FindSpawnByOID(live.TargetOID);
             if (target == null)
                 RemoveTargetLine();
 
@@ -113,9 +108,9 @@ public abstract class ActorScript : MonoBehaviour, IPointerClickHandler
 
     protected void DrawDestinationLine()
     {
-        if (hasActualPosition && _live.ToX != 0 && _live.ToY != 0 && _live.ToZ != 0)
+        if (hasActualPosition && live.ToX != 0 && live.ToY != 0 && live.ToZ != 0)
         {
-            Vector3 destination = WorldUtils.L2ToUnityCoords(_live.ToX, _live.ToY, 0);
+            Vector3 destination = WorldUtils.L2ToUnityCoords(live.ToX, live.ToY, 0);
             float magn = (destination - transform.position).magnitude;
             if (magn > 1 && magn < 2048)
             {
@@ -148,16 +143,23 @@ public abstract class ActorScript : MonoBehaviour, IPointerClickHandler
 
     protected void AttackThisCommand()
     {
-        SM.userActorManager.DoForEachSelected((cl) =>
+        SM.selectionManager.DoForEachSelectedUserActor((ua) =>
         {
-            cl.SendTargetCommand(_live.OID);
-            cl.SendUseActionCommand(3, SM.preferencesManager.isForceAtackEnabled);
+            ua.ai.KillTarget(this);
+        });
+    }
+
+    protected void MoveToThisCommand()
+    {
+        SM.selectionManager.DoForEachSelectedUserActor((ua) =>
+        {
+            ua.ai.MoveToTarget(this);
         });
     }
 
     public void SetDirection()
     {
-        //TODO
+        // TODO Set direction
     }
 
     protected virtual void UpdateInfo(LA2Live obj)
@@ -200,7 +202,7 @@ public abstract class ActorScript : MonoBehaviour, IPointerClickHandler
             SetHighlight(isSelected);
             // if (isSelected)
             // {
-            //     actorInfoPanel.currentActor = _live;
+            //     actorInfoPanel.currentActor = live;
             //     actorInfoPanel.Show();
             // }
         });
@@ -208,7 +210,7 @@ public abstract class ActorScript : MonoBehaviour, IPointerClickHandler
 
     public virtual void SelectAppearance()
     {
-        if (_live.Dead)
+        if (live.Dead)
             SetDeadAppearance();
         else
             SetDefaultAppearance();

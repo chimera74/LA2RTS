@@ -93,6 +93,7 @@ GameObject:
   - component: {fileID: 114863972598676786}
   - component: {fileID: 114381481140466300}
   - component: {fileID: 64567952166758954}
+  - component: {fileID: 7795648930953701253}
   m_Layer: 0
   m_Name: UserActor
   m_TagString: Untagged
@@ -183,6 +184,7 @@ MonoBehaviour:
   namePlate: {fileID: 223843286608228144}
   nameText: {fileID: 114443253970053536}
   actorInfoPanel: {fileID: 0}
+  ai: {fileID: 0}
 --- !u!114 &114381481140466300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,6 +215,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 4300000, guid: 8e406e8a50248f5499b007168c8d1ce1, type: 3}
+--- !u!114 &7795648930953701253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1513211096873578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd69d8d8151e17848a23d20dcf682e41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stance: 0
+  actor: {fileID: 0}
+  target: {fileID: 0}
 --- !u!1 &1759670360594972
 GameObject:
   m_ObjectHideFlags: 0

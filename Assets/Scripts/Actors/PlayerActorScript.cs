@@ -18,15 +18,14 @@ public class PlayerActorScript : ActorScript
         set
         {
             _player = value;
-            _live = value;
+            live = value;
         }
     }
 
 
     // Use this for initialization
-    protected override void Start()
+    protected virtual void Start()
     {
-        base.Start();
         player.UpdateEvent += UpdateInfo;
         player.UpdateEvent += UpdatePosition;
         player.QuickUpdateEvent += UpdatePosition;

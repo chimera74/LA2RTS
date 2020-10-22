@@ -275,4 +275,17 @@ public class SelectionManager : MonoBehaviour
 
         SelectionChangedEvent?.Invoke();
     }
+
+    public void DoForEachSelectedUserActor(Action<UserActorScript> action)
+    {
+
+        foreach (var actor in SM.selectionManager.selectedActors)
+        {
+            var userActor = actor as UserActorScript;
+            if (userActor != null)
+            {
+                action.Invoke(userActor);
+            }
+        }
+    }
 }

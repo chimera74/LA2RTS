@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using LA2RTS.LA2Entities;
 
 public class WorldUtils
 {
@@ -31,6 +32,24 @@ public class WorldUtils
     public static Quaternion ActorDefaultRotation()
     {
         return Quaternion.Euler(0, 0, 0);
+    }
+
+    public static float CalculateDistance(LA2Spawn t1, LA2Spawn t2)
+    {
+        Vector3 v1 = new Vector3(t1.X, t1.Y, t1.Z);
+        Vector3 v2 = new Vector3(t2.X, t2.Y, t2.Z);
+        return (v1 - v2).magnitude;
+    }
+
+    public static float CalculateDistance(LA2Spawn t1, Vector3 t2)
+    {
+        Vector3 v1 = new Vector3(t1.X, t1.Y, 0);
+        return (v1 - t2).magnitude;
+    }
+
+    public static float CalculateDistance(Vector3 t1, Vector3 t2)
+    {
+        return (t1 - t2).magnitude;
     }
 
 }

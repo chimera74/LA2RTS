@@ -17,14 +17,13 @@ public class NPCActorScript : ActorScript
         set
         {
             _npc = value;
-            _live = value;
+            live = value;
         }
     }
 
     // Use this for initialization
-    protected override void Start()
+    protected virtual void Start()
     {
-        base.Start();
         npc.UpdateEvent += UpdateInfo;
         npc.UpdateEvent += UpdatePosition;
         npc.QuickUpdateEvent += UpdatePosition;
@@ -72,13 +71,18 @@ public class NPCActorScript : ActorScript
     {
         if (SM.inputController.targetingMode == InputController.TargetingMode.None)
         {
-            if (pointerEventData.clickCount > 1)
+            if (Input.GetKey(KeyCode.LeftShift))
             {
                 ShowContextMenu(pointerEventData.pressPosition);
             }
             else
             {
-                AttackThisCommand();
+                if (npc.Attackable)
+                    AttackThisCommand();
+                else
+                {
+                    MoveToThisCommand();
+                }
             }
         }
     }

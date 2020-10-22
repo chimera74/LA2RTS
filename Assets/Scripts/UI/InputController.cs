@@ -84,14 +84,11 @@ public class InputController : MonoBehaviour
             return;
         }
 
-        foreach (RTSClient cl in SM.userActorManager.clientProperties.Keys)
+        SM.selectionManager.DoForEachSelectedUserActor((ua) =>
         {
-            if (SM.userActorManager.clientProperties[cl].isSelected && SM.userActorManager.clientProperties[cl].actor != null)
-            {
-                var coords = WorldUtils.UnityToL2Coords(peData.pointerCurrentRaycast.worldPosition);
-                cl.SendMoveToCommand((int)coords.x, (int)coords.y);
-            }
-        }
+            Vector3Int spot = Vector3Int.RoundToInt(WorldUtils.UnityToL2Coords(peData.pointerCurrentRaycast.worldPosition));
+            ua.ai.MoveToSpot(spot);
+        });
     }
 
     public void StartAttackTargeting()
@@ -108,7 +105,7 @@ public class InputController : MonoBehaviour
 
     public void ProcessHotkeys()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && targetingMode != TargetingMode.None)
         {
             ExitTargeting();
             return;

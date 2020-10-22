@@ -19,15 +19,20 @@ public class UserActorScript : ActorScript
         set
         {
             _client = value;
-            _live = value.UserChar;
+            live = value.UserChar;
         }
     }
-    
 
-    // Use this for initialization
-    protected override void Start()
+    public PersonalAI ai;
+
+    protected override void Awake()
     {
-        base.Start();
+        base.Awake();
+        ai = GetComponent<PersonalAI>();
+    }
+
+    protected virtual void Start()
+    {
         client.SelfInfoPacketEvent += UpdateInfo;
         client.SelfInfoPacketEvent += UpdatePosition;
         client.QuickUpdatePacketEvent += UpdateStats;
@@ -47,7 +52,6 @@ public class UserActorScript : ActorScript
         SetHighlight(properties.isSelected);
     }
 
-    // Update is called once per frame
     protected override void Update()
     {
         base.Update();
