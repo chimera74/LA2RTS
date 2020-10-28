@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using LA2RTS.LA2Entities;
 
@@ -6,16 +7,20 @@ public class WorldUtils
 {
 
     //each Unity unit equals 16 L2 units
-    public static float WORLD_SCALE_COEFFICIENT = 16.0f;
+    public static int WORLD_SCALE_COEFFICIENT = 16;
 
     public static Vector3 L2ToUnityCoords(int x, int y, int z)
     {
-        return new Vector3(-x / WORLD_SCALE_COEFFICIENT, z / WORLD_SCALE_COEFFICIENT, y / WORLD_SCALE_COEFFICIENT);
+        return new Vector3((float)-x / WORLD_SCALE_COEFFICIENT,
+            (float)z / WORLD_SCALE_COEFFICIENT,
+            (float)y / WORLD_SCALE_COEFFICIENT);
     }
 
-    public static Vector3 UnityToL2Coords(Vector3 vec)
+    public static Vector3Int UnityToL2Coords(Vector3 vec)
     {
-        return new Vector3(-vec.x * WORLD_SCALE_COEFFICIENT, vec.z * WORLD_SCALE_COEFFICIENT, vec.y * WORLD_SCALE_COEFFICIENT);
+        return new Vector3Int(Convert.ToInt32(-vec.x * WORLD_SCALE_COEFFICIENT),
+            Convert.ToInt32(vec.z * WORLD_SCALE_COEFFICIENT),
+            Convert.ToInt32(vec.y * WORLD_SCALE_COEFFICIENT));
     }
 
     public static Quaternion GetRotationToFacePos(Vector3 ojectPos, Vector3 targetPos)

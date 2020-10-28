@@ -48,7 +48,8 @@ public class NPCActorManager : MonoBehaviour
                 nas.npc = npc;
                 npc.ExpiredEvent += RemoveNPC;
                 var np = npcProperties[npc];
-                np.actor = newActor;
+                np.gameObject = newActor;
+                np.actorScript = nas;
             });
         }
     }
@@ -58,7 +59,7 @@ public class NPCActorManager : MonoBehaviour
         _actionQueue.Enqueue(() =>
         {
             var np = npcProperties[npc];
-            Destroy(np.actor);
+            Destroy(np.gameObject);
             npcProperties.Remove(npc);
         });
 

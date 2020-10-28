@@ -69,11 +69,22 @@ public class InputController : MonoBehaviour
 
     private void OnGroundLeftClick(PointerEventData peData)
     {
-        if (targetingMode == TargetingMode.None)
+        switch (targetingMode)
         {
-            if (!selectionRect.isVisible)
-                SM.selectionManager.ClearSelection();
+            case TargetingMode.AttackMove:
+                SM.selectionManager.DoForEachSelectedUserActor((ua) =>
+                {
+                    Vector3Int spot = Vector3Int.RoundToInt(WorldUtils.UnityToL2Coords(peData.pointerCurrentRaycast.worldPosition));
+                    ua.ai.AttackMove(spot);
+                });
+                break;
+            default:
+                if (!selectionRect.isVisible)
+                    SM.selectionManager.ClearSelection();
+                break;
         }
+
+        ExitTargeting();
     }
 
     private void OnGroundRightClick(PointerEventData peData)
@@ -83,7 +94,7 @@ public class InputController : MonoBehaviour
             ExitTargeting();
             return;
         }
-
+        
         SM.selectionManager.DoForEachSelectedUserActor((ua) =>
         {
             Vector3Int spot = Vector3Int.RoundToInt(WorldUtils.UnityToL2Coords(peData.pointerCurrentRaycast.worldPosition));
@@ -93,7 +104,7 @@ public class InputController : MonoBehaviour
 
     public void StartAttackTargeting()
     {
-        targetingMode = TargetingMode.SimpleAttack;
+        targetingMode = TargetingMode.AttackMove;
         Cursor.SetCursor(attackCursorTexture, hotSpot, cursorMode);
     }
 

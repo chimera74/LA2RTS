@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using LA2RTS;
 using UnityEngine;
 
@@ -16,18 +18,31 @@ public class PersonalAI : MonoBehaviour
     public RTSClient client;
     [HideInInspector]
     public UserActorScript actor;
+    [HideInInspector]
+    public L2RTSServerManager SM;
+
+    public Stack<PersonalAIState> stateStack;
 
     private bool stateIsSwitching;
     private PersonalAIState newState;
 
+    public const int MOVE_TO_SPOT_DISTANCE = 10;
+    public const int MOVE_TO_TARGET_DISTANCE = 100;
+    public const int SEARCH_TARGET_DISTANCE = 600;
+
+    public event Action<PersonalAIState> AIStateChanged;
+
     protected void Awake()
     {
         actor = GetComponent<UserActorScript>();
+        SM = FindObjectOfType<L2RTSServerManager>();
+        stateStack = new Stack<PersonalAIState>();
     }
 
     protected void Start()
     {
         client = actor.client;
+        AIStateChanged += SM.userActorManager.clientProperties[client].panel.OnAIStateChanged;
         SwitchState(GetDefaultState());
     }
 
@@ -45,6 +60,7 @@ public class PersonalAI : MonoBehaviour
         state?.OnExit();
         state = newState;
         state.OnEnter();
+        AIStateChanged?.Invoke(state);
     }
 
     public PersonalAIState GetDefaultState()
@@ -59,7 +75,7 @@ public class PersonalAI : MonoBehaviour
 
     #region StateSwitches
 
-    public void SwitchState(PersonalAIState toState)
+    private void SwitchState(PersonalAIState toState)
     {
         InjectDependencies(ref toState);
         newState = toState;
@@ -74,17 +90,26 @@ public class PersonalAI : MonoBehaviour
 
     public void MoveToSpot(Vector3Int spot)
     {
-        SwitchState(new MoveToSpotAIState(spot));
+        ClearStack();
+        AddToStackAndSwitchTo(new MoveToSpotAIState(spot));
     }
 
-    public void MoveToTarget(ActorScript target)
+    public void MoveToTarget(ActorScript target, bool follow)
     {
-        SwitchState(new MoveToTargetAIState(target));
+        ClearStack();
+        AddToStackAndSwitchTo(new MoveToTargetAIState(target, follow));
     }
 
     public void KillTarget(ActorScript target)
     {
-        SwitchState(new KillTargetAIState(target));
+        ClearStack();
+        AddToStackAndSwitchTo(new KillTargetAIState(target));
+    }
+
+    public void AttackMove(Vector3Int spot)
+    {
+        ClearStack();
+        AddToStackAndSwitchTo(new AttackMoveAIState(spot));
     }
 
     public void Idle()
@@ -92,7 +117,75 @@ public class PersonalAI : MonoBehaviour
 
     }
 
+    private void ClearStack()
+    {
+        stateStack.Clear();
+    }
+
+    private void AddToStack(PersonalAIState state)
+    {
+        stateStack.Push(state);
+    }
+
+    private void RemoveCurrentFromStack()
+    {
+        stateStack.Pop();
+    }
+
+    public void SwitchToDefaultState()
+    {
+        ClearStack();
+        AddToStack(GetDefaultState());
+        SwitchState(stateStack.Peek());
+    }
+
+    public void AddToStackAndSwitchTo(PersonalAIState state)
+    {
+        AddToStack(state);
+        SwitchState(stateStack.Peek());
+    }
+
+    public void SwitchToPreviousInStack()
+    {
+        if (stateStack.Count > 0)
+            stateStack.Pop();
+        if (stateStack.Count > 0)
+            SwitchState(stateStack.Peek());
+        else
+        {
+            SwitchToDefaultState();
+        }
+    }
+
     #endregion
+
+    /// <summary>
+    /// Looks for a valid target to attack in range.
+    /// </summary>
+    /// <returns>Actor that is in rage of attack.</returns>
+    public ActorScript LookForTarget(int range)
+    {
+        var query = from npc in SM.npcActorManager.npcProperties
+            let dist = WorldUtils.CalculateDistance(actor.live, npc.Key)
+            where dist <= SEARCH_TARGET_DISTANCE && !npc.Key.Dead && npc.Key.Attackable
+            orderby dist
+            select new
+            {
+                npc.Value.actorScript,
+                dist
+            };
+        var closest = query.FirstOrDefault();
+        return closest?.actorScript;
+    }
+
+    /// <summary>
+    /// Looks for an attacker.
+    /// </summary>
+    /// <returns>Actor that is attacking us.</returns>
+    public ActorScript LookForAttacker()
+    {
+        return null;
+    }
 }
 
 public enum AIState

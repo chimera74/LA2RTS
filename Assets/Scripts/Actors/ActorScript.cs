@@ -61,21 +61,21 @@ public abstract class ActorScript : MonoBehaviour, IPointerClickHandler
             if (target is LA2UserChar ucTarget)
             {
                 var props = SM.userActorManager.clientProperties[ucTarget.client];
-                SetTargetLine(props.actor.transform.position);
+                SetTargetLine(props.gameObject.transform.position);
                 return;
             }
 
             if (target is LA2Char charTarget)
             {
                 var props = SM.playerActorManager.playerProperties[charTarget];
-                SetTargetLine(props.actor.transform.position);
+                SetTargetLine(props.gameObject.transform.position);
                 return;
             }
 
             if (target is LA2NPC npcTarget)
             {
                 var props = SM.npcActorManager.npcProperties[npcTarget];
-                SetTargetLine(props.actor.transform.position);
+                SetTargetLine(props.gameObject.transform.position);
                 return;
             }
 
@@ -153,7 +153,7 @@ public abstract class ActorScript : MonoBehaviour, IPointerClickHandler
     {
         SM.selectionManager.DoForEachSelectedUserActor((ua) =>
         {
-            ua.ai.MoveToTarget(this);
+            ua.ai.MoveToTarget(this, true);
         });
     }
 

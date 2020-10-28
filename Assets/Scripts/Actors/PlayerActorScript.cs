@@ -102,7 +102,10 @@ public class PlayerActorScript : ActorScript
 
     protected override void OnRightMouseClick(PointerEventData pointerEventData)
     {
-        
+        if (SM.inputController.targetingMode == InputController.TargetingMode.None)
+        {
+            MoveToThisCommand();
+        }
     }
 
     protected override void OnLeftMouseClick(PointerEventData pointerEventData)

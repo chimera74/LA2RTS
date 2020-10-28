@@ -56,14 +56,15 @@ public class UserActorManager : MonoBehaviour
         var uas = newActor.GetComponent<UserActorScript>();
         uas.client = cl;
         var cp = clientProperties[cl];
-        cp.actor = newActor;
+        cp.gameObject = newActor;
+        cp.actorScript = uas;
     }
 
     private void DestroyActor(RTSClient cl)
     {
         var cp = clientProperties[cl];
-        Destroy(cp.actor);
-        cp.actor = null;
+        Destroy(cp.gameObject);
+        cp.gameObject = null;
     }
 
     private void MoveCameraOnFirstActor(RTSClient cl)
@@ -79,9 +80,9 @@ public class UserActorManager : MonoBehaviour
     {
         if (cl.UserChar.Status == LA2UserChar.ClientStatus.InGame)
         {
-            if (clientProperties[cl].actor == null)
+            if (clientProperties[cl].gameObject == null)
             {
-                if (clientProperties.Values.All(p => p.actor == null))
+                if (clientProperties.Values.All(p => p.gameObject == null))
                 {
                     cl.FirstPositionPacketEvent += MoveCameraOnFirstActor;
                 }
@@ -95,7 +96,7 @@ public class UserActorManager : MonoBehaviour
         }
         else
         {
-            if (clientProperties[cl].actor != null)
+            if (clientProperties[cl].gameObject != null)
             {
                 cl.FirstPositionPacketEvent -= MoveCameraOnFirstActor;
                 _actionQueue.Enqueue(() =>
@@ -110,7 +111,7 @@ public class UserActorManager : MonoBehaviour
     {
         _actionQueue.Enqueue(() =>
         {
-            Destroy(clientProperties[cl].actor);
+            Destroy(clientProperties[cl].gameObject);
             clientProperties.Remove(cl);
         });
     }

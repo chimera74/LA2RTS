@@ -9,7 +9,6 @@ public class MoveToSpotAIState : PersonalAIState
 {
     DateTime lastSend = DateTime.Now;
 
-    public const float MOVE_TO_SPOT_DISTANCE = 10;
     public Vector3Int targetSpot;
 
     public MoveToSpotAIState(Vector3Int spot)
@@ -33,9 +32,9 @@ public class MoveToSpotAIState : PersonalAIState
 
     public override void OnUpdate()
     {
-        if (WorldUtils.CalculateDistance(personalAI.client.UserChar, targetSpot) < MOVE_TO_SPOT_DISTANCE)
+        if (WorldUtils.CalculateDistance(personalAI.client.UserChar, targetSpot) < PersonalAI.MOVE_TO_SPOT_DISTANCE)
         {
-            personalAI.SwitchState(personalAI.GetDefaultState());
+            personalAI.SwitchToPreviousInStack();
         }
         else if (DateTime.Now - lastSend >= TimeSpan.FromMilliseconds(1000))
         {

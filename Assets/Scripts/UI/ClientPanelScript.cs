@@ -28,13 +28,12 @@ public class ClientPanelScript : MonoBehaviour
     void Awake()
     {
         _actionQueue = new SimpleActionQueue();
+        SM = FindObjectOfType<L2RTSServerManager>();
     }
 
     // Use this for initialization
     void Start()
     {
-        SM = FindObjectOfType<L2RTSServerManager>();
-
         client.SelfInfoPacketEvent += UpdateClientInfo;
         client.StatusPacketEvent += UpdateStatus;
         client.FirstPositionPacketEvent += UpdateClientInfo;
@@ -59,7 +58,10 @@ public class ClientPanelScript : MonoBehaviour
     public void SetStatus(string statusStr)
     {
         statusLabel.text = statusStr;
+    }
 
+    public void SetStatusColor()
+    {
         switch (client.UserChar.Status)
         {
             case LA2UserChar.ClientStatus.Off:
@@ -112,8 +114,8 @@ public class ClientPanelScript : MonoBehaviour
 
     private void OnLeftMouseDoubleClick(PointerEventData pointerEventData)
     {
-        if (properties.actor != null)
-            _mainCamera.LookAt(properties.actor.transform.position);
+        if (properties.gameObject != null)
+            _mainCamera.LookAt(properties.gameObject.transform.position);
     }
 
 
@@ -139,16 +141,14 @@ public class ClientPanelScript : MonoBehaviour
         {
             SetName(cl.UserChar.Name);
             SetStatus(cl.UserChar.Status.ToString());
+            SetStatusColor();
         });
     }
 
 
     private void UpdateStatus(RTSClient cl)
     {
-        _actionQueue.Enqueue(() =>
-        {
-            SetStatus(cl.UserChar.Status.ToString());
-        });
+        _actionQueue.Enqueue(SetStatusColor);
     }
 
     public void SetHighlight(bool isHighlighted)
@@ -159,5 +159,10 @@ public class ClientPanelScript : MonoBehaviour
     private void OnSelectionChanged(bool isSelected)
     {
         _actionQueue.Enqueue(() => SetHighlight(isSelected));
+    }
+
+    public void OnAIStateChanged(PersonalAIState state)
+    {
+        SetStatus(state.ToString());
     }
 }

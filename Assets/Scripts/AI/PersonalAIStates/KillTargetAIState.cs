@@ -26,7 +26,12 @@ public class KillTargetAIState : PersonalAIState
     {
         if (target.live.Dead)
         {
-            personalAI.SwitchState(personalAI.GetDefaultState());
+            personalAI.SwitchToPreviousInStack();
         }
+        else
+        {
+            client.SendTargetCommand(target.live.OID);
+        }
+
     }
 }

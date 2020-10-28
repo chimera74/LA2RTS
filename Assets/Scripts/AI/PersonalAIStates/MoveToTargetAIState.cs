@@ -6,14 +6,16 @@ using System.Threading.Tasks;
 
 public class MoveToTargetAIState : PersonalAIState
 {
-    public const float MOVE_TO_DISTANCE = 100;
+    
     DateTime lastSend = DateTime.Now;
 
     public ActorScript target;
+    public bool isFollowing;
 
-    public MoveToTargetAIState(ActorScript target)
+    public MoveToTargetAIState(ActorScript target, bool follow)
     {
         this.target = target;
+        isFollowing = follow;
     }
 
     public override void OnEnter()
@@ -28,7 +30,7 @@ public class MoveToTargetAIState : PersonalAIState
         if (DateTime.Now - lastSend < TimeSpan.FromMilliseconds(1000))
             return;
 
-        if (WorldUtils.CalculateDistance(personalAI.client.UserChar, target.live) > MOVE_TO_DISTANCE)
+        if (WorldUtils.CalculateDistance(personalAI.client.UserChar, target.live) > PersonalAI.MOVE_TO_TARGET_DISTANCE)
         {
             client.SendMoveToCommand(target.live.X, target.live.Y, target.live.Z);
             lastSend = DateTime.Now;

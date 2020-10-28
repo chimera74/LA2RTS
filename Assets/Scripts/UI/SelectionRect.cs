@@ -136,7 +136,7 @@ public class SelectionRect : MonoBehaviour {
 
         foreach (var kv in SM.userActorManager.clientProperties)
         {
-            var actor = kv.Value.actor;
+            var actor = kv.Value.gameObject;
             if (actor == null)
                 continue;
 

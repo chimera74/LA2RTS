@@ -26,7 +26,7 @@ public class ActionsPanelScript : ButtonPanel
             var cp = userActorManager.clientProperties[cl];
             if (cp != null && cp.isSelected)
             {
-                Vector3 d = WorldUtils.UnityToL2Coords(cp.actor.transform.position);
+                Vector3 d = WorldUtils.UnityToL2Coords(cp.gameObject.transform.position);
                 cl.SendMoveToCommand((int) d.x, (int) d.y);
             }
                 

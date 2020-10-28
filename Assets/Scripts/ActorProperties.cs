@@ -17,6 +17,8 @@ public class ActorProperties
         }
     }
 
-    public GameObject actor;
+    public GameObject gameObject;
+    public ActorScript actorScript;
+    public ClientPanelScript panel;
 
 }

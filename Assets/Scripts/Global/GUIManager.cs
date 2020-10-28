@@ -66,7 +66,8 @@ public class GUIManager : MonoBehaviour {
             var cps = newClientPanel.GetComponent<ClientPanelScript>();
             cps.client = cl;
             cps.SetHighlight(false);
-            
+            SM.userActorManager.clientProperties[cl].panel = cps;
+
         });
     }
 

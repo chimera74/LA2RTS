@@ -14,4 +14,9 @@ public abstract class PersonalAIState
     public virtual void OnEnter() {}
     public virtual void OnExit() {}
     public abstract void OnUpdate();
+
+    public override string ToString()
+    {
+        return GetType().Name;
+    }
 }

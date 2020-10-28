@@ -69,9 +69,9 @@ public class SelectionManager : MonoBehaviour
         bool isUserSelected = false;
         foreach (var kv in SM.userActorManager.clientProperties)
         {
-            if (kv.Value.actor == null)
+            if (kv.Value.gameObject == null)
                 continue;
-            var uas = kv.Value.actor.GetComponent<UserActorScript>();
+            var uas = kv.Value.gameObject.GetComponent<UserActorScript>();
             if (kv.Value.isSelected)
             {
                 if (!selectedActors.Contains(uas))

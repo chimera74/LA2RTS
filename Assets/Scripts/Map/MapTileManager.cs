@@ -33,10 +33,10 @@ public class MapTileManager : MonoBehaviour
         foreach (var cl in SM.userActorManager.clientProperties.Keys)
         {
             var cp = SM.userActorManager.clientProperties[cl];
-            if (cp != null && cp.actor != null)
+            if (cp != null && cp.gameObject != null)
             {
-                int x = (int)(20 - (cp.actor.transform.position.x / 2048));
-                int y = (int)(18 + (cp.actor.transform.position.z / 2048));
+                int x = (int)(20 - (cp.gameObject.transform.position.x / 2048));
+                int y = (int)(18 + (cp.gameObject.transform.position.z / 2048));
 
                 for (int _x = x - 1; _x <= x + 1; _x++)
                     for (int _y = y - 1; _y <= y + 1; _y++)

@@ -50,7 +50,8 @@ public class PlayerActorManager : MonoBehaviour
                 pas.player = pl;
                 pl.ExpiredEvent += RemovePlayer;
                 var pp = playerProperties[pl];
-                pp.actor = newActor;
+                pp.gameObject = newActor;
+                pp.actorScript = pas;
             });
         }
     }
@@ -60,7 +61,7 @@ public class PlayerActorManager : MonoBehaviour
         _actionQueue.Enqueue(() =>
         {
             var pp = playerProperties[pl];
-            Destroy(pp.actor);
+            Destroy(pp.gameObject);
             playerProperties.Remove(pl);
         });
 
